@@ -6,36 +6,37 @@
 //  Copyright © 2019 Wesley Carlan. All rights reserved.
 //
 
+import Foundation
+
 public class WireMockTest {
     
-    private static var sharedInstance = WireMockTest()
+    private static var shared = WireMockTest()
     
+    // MARK: - Configuration
     private var configuration: WireMockConfiguration = WireMockConfiguration()
     
     class var configuration: WireMockConfiguration {
-        get { return sharedInstance.configuration }
-        set { sharedInstance.configuration = newValue }
+        get { return shared.configuration }
+        set { shared.configuration = newValue }
     }
     
-    class var mappings: [WireMockMapping] {
-        return WireMockCalls.getMappings()
-    }
-    
+    // MARK: - Initialization
     class func initializeSession() throws {
         if let initializationError = WireMockCalls.initializeSession() {
             throw initializationError
         }
     }
     
-    class func createMapping(_ mapping: WireMockMapping) {
-        WireMockCalls.createMapping(mapping)
+    // MARK: - Stubbing
+    class func stub(_ path: String) -> WireMockStub {
+        return WireMockStub(path: path)
     }
     
-    class func updateMapping(_ mapping: WireMockMapping) {
-        WireMockCalls.updateMapping(mapping)
+    class func stub(_ request: WireMockRequest) -> WireMockStub {
+        return WireMockStub(request: request)
     }
     
-    class func resetMappings() {
-        WireMockCalls.resetMappings()
+    class func resetStubs() {
+        WireMockApi.resetMappings()
     }
 }

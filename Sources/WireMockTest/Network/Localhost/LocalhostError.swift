@@ -9,6 +9,7 @@
 import Foundation
 
 struct LocalhostError: Error {
+    
     enum ErrorType {
         case invalidUrl(url: String)
         case invalidResponse(urlResponse: URLResponse?)
@@ -23,7 +24,7 @@ struct LocalhostError: Error {
         case .invalidUrl(let url):
             return "Localhost Error - Invalid URL: \(url)"
         case .invalidResponse(let urlResponse):
-            return "Localhost Error - Invalid Response: \(urlResponse?.description ?? "")"
+            return "Localhost Error - Invalid Response: \(urlResponse?.description ?? "nil")"
         case .wireMockServer(let statusCode):
             return "Localhost Error - WireMock Server Error: \(statusCode)"
         case .parsing:

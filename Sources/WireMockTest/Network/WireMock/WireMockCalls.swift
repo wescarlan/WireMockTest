@@ -10,6 +10,16 @@ import Foundation
 
 class WireMockCalls {
     
+    // MARK: - Admin API Path
+    struct Path {
+        static let mappings = "__admin/mappings"
+        static let reset = "__admin/reset"
+        
+        static func mappings(uuid: UUID) -> String {
+            return "\(Path.mappings)/\(uuid.uuidString)"
+        }
+    }
+    
     // MARK: - Session Configuration
     private class var sessionManager: LocalhostSessionManager {
         return LocalhostSessionManager.shared
@@ -47,10 +57,8 @@ class WireMockCalls {
     }
     
     // MARK: - Get Mappings
-    private static let mappingsPath = "__admin/mappings"
-    
     private class func getMappingsAsync(success: (([WireMockMapping]) -> Void)?, failure: ((Error?) -> Void)?) {
-        sessionManager.get(path: mappingsPath, success: { (responseData) in
+        sessionManager.get(path: Path.mappings, success: { (responseData) in
             guard let mappingResponse = try? JSONDecoder().decode(GetMappingsResponse.self, from: responseData) else {
                 // TODO - create WireMockError object
                 failure?(LocalhostError(type: .parsing))
@@ -79,11 +87,42 @@ class WireMockCalls {
         return mappings
     }
     
+    // MARK: - Get Mapping
+    private class func getMappingAsync(uuid: UUID, success: ((WireMockMapping) -> Void)?, failure: ((Error?) -> Void)?) {
+        sessionManager.get(path: Path.mappings(uuid: uuid), success: { (responseData) in
+            guard let mapping = try? JSONDecoder().decode(WireMockMapping.self, from: responseData) else {
+                // TODO - create WireMockError object
+                failure?(LocalhostError(type: .parsing))
+                return
+            }
+            
+            success?(mapping)
+        }, failure: failure)
+    }
+    
+    class func getMapping(uuid: UUID) -> WireMockMapping? {
+        var mapping: WireMockMapping?
+        
+        makeSynchronousCall { (semaphore) in
+            getMappingAsync(uuid: uuid, success: { (wireMockMapping) in
+                mapping = wireMockMapping
+                semaphore.signal()
+            }, failure: { (error) in
+                if let error = error, configuration.loggingEnabled {
+                    print(error.localizedDescription)
+                }
+                semaphore.signal()
+            })
+        }
+        
+        return mapping
+    }
+    
     // MARK: - Create Mapping
     private class func createMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
         let bodyData = try? JSONEncoder().encode(mapping)
         
-        sessionManager.post(path: mappingsPath, bodyData: bodyData, success: { (_) in
+        sessionManager.post(path: Path.mappings, bodyData: bodyData, success: { (_) in
             success?()
         }, failure: failure)
     }
@@ -102,12 +141,8 @@ class WireMockCalls {
     }
     
     // MARK: - Update Mapping
-    private class func updateMappingPath(uuid: UUID) -> String {
-        return "\(mappingsPath)/\(uuid.uuidString)"
-    }
-    
     private class func updateMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
-        let path = updateMappingPath(uuid: mapping.uuid)
+        let path = Path.mappings(uuid: mapping.uuid)
         let bodyData = try? JSONEncoder().encode(mapping)
         
         sessionManager.put(path: path, bodyData: bodyData, success: { (_) in
@@ -129,10 +164,8 @@ class WireMockCalls {
     }
     
     // MARK: - Reset Mappings
-    private static let resetMappingsPath = "__admin/reset"
-    
     private class func resetMappingsAsync(success: (() -> Void)?, failure: ((Error?) -> Void)?) {
-        sessionManager.post(path: resetMappingsPath, bodyData: nil, success: { (_) in
+        sessionManager.post(path: Path.reset, bodyData: nil, success: { (_) in
             success?()
         }, failure: failure)
     }

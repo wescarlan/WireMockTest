@@ -6,14 +6,17 @@
 //  Copyright © 2019 Wesley Carlan. All rights reserved.
 //
 
-enum HTTPMethod: String, Codable {
+// MARK: - HTTPMethod -
+public enum HTTPMethod: String, Codable {
     case get = "GET"
     case post = "POST"
     case put = "PUT"
     case delete = "DELETE"
+    case any = "ANY"
 }
 
-struct HTTPHeader {
+// MARK: - HTTPHeader -
+public struct HTTPHeader {
     struct Field {
         static let contentType = "Content-Type"
     }
@@ -23,7 +26,8 @@ struct HTTPHeader {
     }
 }
 
-struct HTTPStatusCode {
+// MARK: - HTTPStatusCode -
+public struct HTTPStatusCode {
     static let informationRange = 100...199
     static let successRange = 200...299
     static let redirectRange = 300...399

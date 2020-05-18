@@ -15,7 +15,7 @@ class LocalhostSessionManager {
     typealias LocalhostFailure = (Error?) -> Void
     
     // MARK: - Shared Instance
-    /// The shared LocalHostSessionManager instance. Use this to
+    /// The shared LocalHostSessionManager instance
     static let shared = LocalhostSessionManager()
     
     // MARK: - Shared URL Configuration
@@ -89,7 +89,7 @@ class LocalhostSessionManager {
         success?(data)
     }
     
-    // MARK: - GET
+    // MARK: - GET Request
     /// Execute a GET request
     func get(path: String, success: LocalhostSuccess?, failure: LocalhostFailure?) {
         guard let url = url(path: path) else {
@@ -109,7 +109,7 @@ class LocalhostSessionManager {
         task.resume()
     }
     
-    // MARK: - POST
+    // MARK: - POST Request
     /// Execute a POST request
     func post(path: String, bodyData: Data?, success: LocalhostSuccess?, failure: LocalhostFailure?) {
         guard let url = url(path: path) else {
@@ -131,7 +131,7 @@ class LocalhostSessionManager {
         task.resume()
     }
     
-    // MARK: - PUT
+    // MARK: - PUT Request
     /// Execute a PUT request
     func put(path: String, bodyData: Data?, success: LocalhostSuccess?, failure: LocalhostFailure?) {
         guard let url = url(path: path) else {

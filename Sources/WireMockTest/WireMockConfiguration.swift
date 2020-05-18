@@ -6,13 +6,13 @@
 //  Copyright © 2019 Wesley Carlan. All rights reserved.
 //
 
-struct WireMockConfiguration {
+public struct WireMockConfiguration {
     
     var port: String
     var loggingEnabled: Bool
     
-    init() {
-        self.port = "8080"
-        self.loggingEnabled = true
+    init(port: String = "8080", loggingEnabled: Bool = true) {
+        self.port = port
+        self.loggingEnabled = loggingEnabled
     }
 }
