@@ -8,35 +8,34 @@
 
 import Foundation
 
-public class WireMockTest {
+open class WireMockTest {
     
-    private static var shared = WireMockTest()
+    public static var loggingEnabled = true
+    private let configuration: WireMockConfiguration
+    private let wireMockCalls: WireMockCalls
     
-    // MARK: - Configuration
-    private var configuration: WireMockConfiguration = WireMockConfiguration()
-    
-    class var configuration: WireMockConfiguration {
-        get { return shared.configuration }
-        set { shared.configuration = newValue }
+    public init(configuration: WireMockConfiguration = WireMockConfiguration()) {
+        self.configuration = configuration
+        self.wireMockCalls = WireMockCalls(configuration: configuration)
     }
     
     // MARK: - Initialization
-    class func initializeSession() throws {
-        if let initializationError = WireMockCalls.initializeSession() {
+    open func initializeSession() throws {
+        if let initializationError = wireMockCalls.initializeSession() {
             throw initializationError
         }
     }
     
     // MARK: - Stubbing
-    class func stub(_ path: String) -> WireMockStub {
-        return WireMockStub(path: path)
+    open func stub(_ path: String) -> WireMockStub {
+        return WireMockStub(path: path, configuration: configuration)
     }
     
-    class func stub(_ request: WireMockRequest) -> WireMockStub {
-        return WireMockStub(request: request)
+    open func stub(_ request: WireMockRequest) -> WireMockStub {
+        return WireMockStub(request: request, configuration: configuration)
     }
     
-    class func resetStubs() {
-        WireMockApi.resetMappings()
+    open func resetStubs() {
+        wireMockCalls.resetMappings()
     }
 }

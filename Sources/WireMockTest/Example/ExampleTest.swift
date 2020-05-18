@@ -8,10 +8,13 @@
 import Foundation
 
 class ExampleTest {
+    
+    let wireMock = WireMockTest()
+    let wireMockApi = WireMockApi()
 
     func setUp() {
         do {
-            try WireMockTest.initializeSession()
+            try wireMock.initializeSession()
         } catch {
             fatalError(error.localizedDescription)
         }
@@ -20,14 +23,14 @@ class ExampleTest {
     // Update mappings using the API directly
     func test1() {
         guard let uuid = UUID(uuidString: "123"),
-            var mapping = WireMockApi.getMapping(uuid),
+            var mapping = wireMockApi.getMapping(uuid),
             var exampleResponseObject = mapping.decodeResponseJson(ExampleCodable.self)
             else { return }
         
         exampleResponseObject.value = "newValue"
         mapping.updateResponseJson(exampleResponseObject)
         
-        WireMockApi.updateMapping(mapping)
+        wireMockApi.updateMapping(mapping)
     }
     
     // Create mapping using WireMockRequest and WireMockResponse objects with stubbing
@@ -35,13 +38,13 @@ class ExampleTest {
         let request = WireMockRequest(method: .get, path: "/path")
         let response = WireMockResponse(response: ExampleCodable(value: "newValue"))
         
-        WireMockTest.stub(request)
+        wireMock.stub(request)
             .andReturn(response)
     }
     
     // Create mapping with stubbing
     func test3() {
-        WireMockTest.stub("/path")
+        wireMock.stub("/path")
             .forHttpMethod(.get)
             .andSetStatus(200)
             .andSetFixedDelay(5)

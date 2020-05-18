@@ -14,13 +14,18 @@ open class WireMockStub {
     private var responseDelay: Int?
     private var responseHeaders: [String: String]?
     
+    private let configuration: WireMockConfiguration
+    private let wireMockCalls: WireMockCalls
+    
     // MARK: - Initializers
-    public init(path: String) {
-        request = WireMockRequest(path: path)
+    init(request: WireMockRequest, configuration: WireMockConfiguration) {
+        self.request = request
+        self.configuration = configuration
+        self.wireMockCalls = WireMockCalls(configuration: configuration)
     }
     
-    public init(request: WireMockRequest) {
-        self.request = request
+    convenience init(path: String, configuration: WireMockConfiguration) {
+        self.init(request: WireMockRequest(path: path), configuration: configuration)
     }
     
     // MARK: - Request Setters
@@ -60,7 +65,7 @@ open class WireMockStub {
             let responseString = String(data: responseData, encoding: .utf8)
             wireMockResponse.body = responseString
         } catch {
-            if WireMockTest.configuration.loggingEnabled {
+            if WireMockTest.loggingEnabled {
                 print(error.localizedDescription)
             }
         }
@@ -91,7 +96,7 @@ open class WireMockStub {
     @discardableResult
     open func andReturn(_ response: WireMockResponse) -> WireMockMapping {
         let mapping = WireMockMapping(request: request, response: response)
-        WireMockApi.createMapping(mapping)
+        wireMockCalls.createMapping(mapping)
         return mapping
     }
 }

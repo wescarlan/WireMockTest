@@ -57,7 +57,7 @@ public struct WireMockResponse {
             let json = try jsonSerializer.jsonObject(with: responseData, options: []) as? [String: Any]
             self.jsonBody = json
         } catch {
-            if WireMockTest.configuration.loggingEnabled {
+            if WireMockTest.loggingEnabled {
                 print(error.localizedDescription)
             }
         }
@@ -95,7 +95,7 @@ public struct WireMockResponse {
         do {
             return try jsonDecoder.decode(responseClass, from: data)
         } catch {
-            if WireMockTest.configuration.loggingEnabled {
+            if WireMockTest.loggingEnabled {
                 print(error.localizedDescription)
             }
             return nil
@@ -108,7 +108,7 @@ public struct WireMockResponse {
             let json = try jsonSerializer.jsonObject(with: data, options: []) as? [String: Any]
             self.jsonBody = json
         } catch {
-            if WireMockTest.configuration.loggingEnabled {
+            if WireMockTest.loggingEnabled {
                 print(error.localizedDescription)
             }
         }

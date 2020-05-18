@@ -8,24 +8,19 @@
 
 import Foundation
 
-struct LocalhostError: Error {
-    
-    enum ErrorType {
-        case invalidUrl(url: String)
-        case invalidResponse(urlResponse: URLResponse?)
-        case wireMockServer(statusCode: Int)
-        case parsing
-    }
-    
-    let type: ErrorType
+enum LocalhostError: Error {
+    case invalidUrl(url: String)
+    case invalidResponse(urlResponse: URLResponse?)
+    case localhostServer(statusCode: Int)
+    case parsing
     
     var localizedDescription: String {
-        switch type {
+        switch self {
         case .invalidUrl(let url):
             return "Localhost Error - Invalid URL: \(url)"
         case .invalidResponse(let urlResponse):
             return "Localhost Error - Invalid Response: \(urlResponse?.description ?? "nil")"
-        case .wireMockServer(let statusCode):
+        case .localhostServer(let statusCode):
             return "Localhost Error - WireMock Server Error: \(statusCode)"
         case .parsing:
             return "Localhost Error - Failed to Parse Response"

@@ -20,32 +20,35 @@ class WireMockCalls {
         }
     }
     
-    // MARK: - Session Configuration
-    private class var sessionManager: LocalhostSessionManager {
-        return LocalhostSessionManager.shared
-    }
+    // MARK: - Properties
+    private let configuration: WireMockConfiguration
+    private let sessionManager: LocalhostSessionManager
     
-    private class var configuration: WireMockConfiguration {
-        return WireMockTest.configuration
+    
+    // MARK: - Initializer
+    init(configuration: WireMockConfiguration) {
+        self.configuration = configuration
+        self.sessionManager = LocalhostSessionManager(configuration: LocalhostConfiguration(configuration))
     }
     
     // MARK: - Initialize session
-    private class func initializeSessionAsync(success: (() -> Void)?, failure: ((Error?) -> Void)?) {
-        resetMappingsAsync(success: {
-            getMappingsAsync(success: { (_) in
+    private func initializeSessionAsync(success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+        resetMappingsAsync(success: { [weak self] in
+            guard let self = self else { return }
+            self.getMappingsAsync(success: { (_) in
                 success?()
             }, failure: failure)
         }, failure: failure)
     }
     
-    class func initializeSession() -> Error? {
+    func initializeSession() -> Error? {
         var error: Error?
         
         makeSynchronousCall { (semaphore) in
             initializeSessionAsync(success: {
                 semaphore.signal()
             }, failure: { (initializationError) in
-                if let initializationError = initializationError, configuration.loggingEnabled {
+                if let initializationError = initializationError, WireMockTest.loggingEnabled {
                     print(initializationError.localizedDescription)
                 }
                 error = initializationError
@@ -57,11 +60,11 @@ class WireMockCalls {
     }
     
     // MARK: - Get Mappings
-    private class func getMappingsAsync(success: (([WireMockMapping]) -> Void)?, failure: ((Error?) -> Void)?) {
+    private func getMappingsAsync(success: (([WireMockMapping]) -> Void)?, failure: ((Error?) -> Void)?) {
         sessionManager.get(path: Path.mappings, success: { (responseData) in
             guard let mappingResponse = try? JSONDecoder().decode(GetMappingsResponse.self, from: responseData) else {
                 // TODO - create WireMockError object
-                failure?(LocalhostError(type: .parsing))
+                failure?(LocalhostError.parsing)
                 return
             }
             
@@ -69,7 +72,7 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    class func getMappings() -> [WireMockMapping] {
+    func getMappings() -> [WireMockMapping] {
         var mappings: [WireMockMapping] = []
         
         makeSynchronousCall { (semaphore) in
@@ -77,7 +80,7 @@ class WireMockCalls {
                 mappings = wireMockMappings
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, configuration.loggingEnabled {
+                if let error = error, WireMockTest.loggingEnabled {
                     print(error.localizedDescription)
                 }
                 semaphore.signal()
@@ -88,11 +91,11 @@ class WireMockCalls {
     }
     
     // MARK: - Get Mapping
-    private class func getMappingAsync(uuid: UUID, success: ((WireMockMapping) -> Void)?, failure: ((Error?) -> Void)?) {
+    private func getMappingAsync(uuid: UUID, success: ((WireMockMapping) -> Void)?, failure: ((Error?) -> Void)?) {
         sessionManager.get(path: Path.mappings(uuid: uuid), success: { (responseData) in
             guard let mapping = try? JSONDecoder().decode(WireMockMapping.self, from: responseData) else {
                 // TODO - create WireMockError object
-                failure?(LocalhostError(type: .parsing))
+                failure?(LocalhostError.parsing)
                 return
             }
             
@@ -100,7 +103,7 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    class func getMapping(uuid: UUID) -> WireMockMapping? {
+    func getMapping(uuid: UUID) -> WireMockMapping? {
         var mapping: WireMockMapping?
         
         makeSynchronousCall { (semaphore) in
@@ -108,7 +111,7 @@ class WireMockCalls {
                 mapping = wireMockMapping
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, configuration.loggingEnabled {
+                if let error = error, WireMockTest.loggingEnabled {
                     print(error.localizedDescription)
                 }
                 semaphore.signal()
@@ -119,7 +122,7 @@ class WireMockCalls {
     }
     
     // MARK: - Create Mapping
-    private class func createMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+    private func createMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
         let bodyData = try? JSONEncoder().encode(mapping)
         
         sessionManager.post(path: Path.mappings, bodyData: bodyData, success: { (_) in
@@ -127,12 +130,12 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    class func createMapping(_ mapping: WireMockMapping) {
+    func createMapping(_ mapping: WireMockMapping) {
         makeSynchronousCall { (semaphore) in
             createMappingAsync(mapping, success: {
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, configuration.loggingEnabled {
+                if let error = error, WireMockTest.loggingEnabled {
                     print(error.localizedDescription)
                 }
                 semaphore.signal()
@@ -141,7 +144,7 @@ class WireMockCalls {
     }
     
     // MARK: - Update Mapping
-    private class func updateMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+    private func updateMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
         let path = Path.mappings(uuid: mapping.uuid)
         let bodyData = try? JSONEncoder().encode(mapping)
         
@@ -150,12 +153,12 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    class func updateMapping(_ mapping: WireMockMapping) {
+    func updateMapping(_ mapping: WireMockMapping) {
         makeSynchronousCall { (semaphore) in
             updateMappingAsync(mapping, success: {
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, configuration.loggingEnabled {
+                if let error = error, WireMockTest.loggingEnabled {
                     print(error.localizedDescription)
                 }
                 semaphore.signal()
@@ -164,18 +167,18 @@ class WireMockCalls {
     }
     
     // MARK: - Reset Mappings
-    private class func resetMappingsAsync(success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+    private func resetMappingsAsync(success: (() -> Void)?, failure: ((Error?) -> Void)?) {
         sessionManager.post(path: Path.reset, bodyData: nil, success: { (_) in
             success?()
         }, failure: failure)
     }
     
-    class func resetMappings() {
+    func resetMappings() {
         makeSynchronousCall { (semaphore) in
             resetMappingsAsync(success: {
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, configuration.loggingEnabled {
+                if let error = error, WireMockTest.loggingEnabled {
                     print(error.localizedDescription)
                 }
                 semaphore.signal()
@@ -184,9 +187,9 @@ class WireMockCalls {
     }
     
     // MARK: - Synchronization
-    private static let synchronizedWaitTimeout: TimeInterval = 5.0
+    private let synchronizedWaitTimeout: TimeInterval = 5.0
     
-    private class func makeSynchronousCall(call: (DispatchSemaphore) -> Void) {
+    private func makeSynchronousCall(call: (DispatchSemaphore) -> Void) {
         let semaphore = DispatchSemaphore(value: 0)
         call(semaphore)
         let _ = semaphore.wait(timeout: .now() + synchronizedWaitTimeout)

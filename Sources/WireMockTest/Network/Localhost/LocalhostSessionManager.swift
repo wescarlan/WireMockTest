@@ -14,25 +14,9 @@ class LocalhostSessionManager {
     typealias LocalhostSuccess = (Data) -> Void
     typealias LocalhostFailure = (Error?) -> Void
     
-    // MARK: - Shared Instance
-    /// The shared LocalHostSessionManager instance
-    static let shared = LocalhostSessionManager()
-    
     // MARK: - Shared URL Configuration
-    private let localhostBaseUrl = "http://localhost"
-    
-    /// The WireMock configuration object with information where the localhost server is running
-    private var configuration: WireMockConfiguration
-    
-    /// The computed WireMock base URL string consisting of the localhost URL combined with the port number
-    private var baseUrlString: String {
-        return "\(localhostBaseUrl):\(configuration.port)/"
-    }
-    
-    /// The computed WireMock base URL consisting of the localhost URL combined with the port number
-    private var baseUrl: URL? {
-        return URL(string: baseUrlString)
-    }
+    /// The Localhost configuration object with information where the localhost server is running
+    private var configuration: LocalhostConfiguration
     
     /// A reference to the shared URLSession instance
     private var urlSession: URLSession {
@@ -40,18 +24,14 @@ class LocalhostSessionManager {
     }
     
     // MARK: - Initializers
-    convenience init() {
-        self.init(configuration: WireMockConfiguration())
-    }
-    
-    init(configuration: WireMockConfiguration) {
+    init(configuration: LocalhostConfiguration) {
         self.configuration = configuration
     }
     
     // MARK: - Request Creation
     /// Get the full URL by appending a path string to the base URL
     private func url(path: String) -> URL? {
-        return baseUrl?.appendingPathComponent(path)
+        return configuration.fullUrl?.appendingPathComponent(path)
     }
     
     /// Get the URLRequest object for a given URL and HTTPMethod
@@ -72,17 +52,17 @@ class LocalhostSessionManager {
         }
         
         guard let httpResponse = response as? HTTPURLResponse else {
-            failure?(LocalhostError(type: .invalidResponse(urlResponse: response)))
+            failure?(LocalhostError.invalidResponse(urlResponse: response))
             return
         }
         
         guard HTTPStatusCode.successRange.contains(httpResponse.statusCode) else {
-            failure?(LocalhostError(type: .wireMockServer(statusCode: httpResponse.statusCode)))
+            failure?(LocalhostError.localhostServer(statusCode: httpResponse.statusCode))
             return
         }
         
         guard let data = data else {
-            failure?(LocalhostError(type: .parsing))
+            failure?(LocalhostError.parsing)
             return
         }
         
@@ -93,7 +73,7 @@ class LocalhostSessionManager {
     /// Execute a GET request
     func get(path: String, success: LocalhostSuccess?, failure: LocalhostFailure?) {
         guard let url = url(path: path) else {
-            failure?(LocalhostError(type: .invalidUrl(url: baseUrlString)))
+            failure?(LocalhostError.invalidUrl(url: configuration.fullUrlString))
             return
         }
         
@@ -113,7 +93,7 @@ class LocalhostSessionManager {
     /// Execute a POST request
     func post(path: String, bodyData: Data?, success: LocalhostSuccess?, failure: LocalhostFailure?) {
         guard let url = url(path: path) else {
-            failure?(LocalhostError(type: .invalidUrl(url: baseUrlString)))
+            failure?(LocalhostError.invalidUrl(url: configuration.fullUrlString))
             return
         }
         
@@ -135,7 +115,7 @@ class LocalhostSessionManager {
     /// Execute a PUT request
     func put(path: String, bodyData: Data?, success: LocalhostSuccess?, failure: LocalhostFailure?) {
         guard let url = url(path: path) else {
-            failure?(LocalhostError(type: .invalidUrl(url: baseUrlString)))
+            failure?(LocalhostError.invalidUrl(url: configuration.fullUrlString))
             return
         }
         

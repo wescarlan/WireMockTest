@@ -9,10 +9,8 @@
 public struct WireMockConfiguration {
     
     var port: String
-    var loggingEnabled: Bool
     
-    init(port: String = "8080", loggingEnabled: Bool = true) {
+    public init(port: String = "8080") {
         self.port = port
-        self.loggingEnabled = loggingEnabled
     }
 }
