@@ -10,11 +10,11 @@ import Foundation
 
 public struct WireMockResponse {
     
-    var status: Int
-    var fixedDelay: Int?
-    var headers: [String: String]?
+    public var status: Int
+    public var fixedDelay: Int?
+    public var headers: [String: String]?
     
-    var body: String? {
+    public var body: String? {
         didSet {
             guard body != nil else { return }
             jsonBody = nil
@@ -22,7 +22,7 @@ public struct WireMockResponse {
         }
     }
     
-    var jsonBody: [String: Any]? {
+    public var jsonBody: [String: Any]? {
         didSet {
             guard jsonBody != nil else { return }
             body = nil
@@ -30,7 +30,7 @@ public struct WireMockResponse {
         }
     }
     
-    var bodyFileName: String? {
+    public var bodyFileName: String? {
         didSet {
             guard bodyFileName != nil else { return }
             body = nil
@@ -43,13 +43,13 @@ public struct WireMockResponse {
     private let jsonSerializer = JSONSerialization.self
     
     // MARK: - Initializers
-    init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil) {
+    public init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil) {
         self.status = status
         self.fixedDelay = fixedDelay
         self.headers = headers
     }
     
-    init<T: Encodable>(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: T) {
+    public init<T: Encodable>(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: T) {
         self.init(status: status, fixedDelay: fixedDelay, headers: headers)
         
         do {
@@ -63,17 +63,17 @@ public struct WireMockResponse {
         }
     }
     
-    init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: [String: Any]) {
+    public init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: [String: Any]) {
         self.init(status: status, fixedDelay: fixedDelay, headers: headers)
         self.jsonBody = response
     }
     
-    init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: String) {
+    public init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: String) {
         self.init(status: status, fixedDelay: fixedDelay, headers: headers)
         self.body = response
     }
     
-    init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: URL) {
+    public init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: URL) {
         self.init(status: status, fixedDelay: fixedDelay, headers: headers)
         self.bodyFileName = response.absoluteString
     }
@@ -89,7 +89,7 @@ public struct WireMockResponse {
         }
     }
     
-    func decodeResponse<T: Decodable>(_ responseClass: T.Type) -> T? {
+    public func decodeResponse<T: Decodable>(_ responseClass: T.Type) -> T? {
         guard let data = bodyData else { return nil }
         
         do {
@@ -102,7 +102,7 @@ public struct WireMockResponse {
         }
     }
     
-    mutating func updateResponse<T: Encodable>(_ response: T) {
+    public mutating func updateResponse<T: Encodable>(_ response: T) {
         do {
             let data = try jsonEncoder.encode(response)
             let json = try jsonSerializer.jsonObject(with: data, options: []) as? [String: Any]

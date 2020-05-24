@@ -8,13 +8,14 @@
 
 public struct WireMockRequest: Codable {
     
-    var method: HTTPMethod
-    var urlPath: String?
-    var urlPattern: String?
-    var urlPathPattern: String?
-    var headers: [String: String]?
+    public var method: HTTPMethod
+    public var url: String?
+    public var urlPath: String?
+    public var urlPattern: String?
+    public var urlPathPattern: String?
+    public var headers: [String: String]?
     
-    init(method: HTTPMethod = .any, path: String) {
+    public init(method: HTTPMethod = .any, path: String) {
         self.method = method
         self.urlPathPattern = path
     }

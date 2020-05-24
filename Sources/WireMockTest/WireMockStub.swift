@@ -18,13 +18,13 @@ open class WireMockStub {
     private let wireMockCalls: WireMockCalls
     
     // MARK: - Initializers
-    init(request: WireMockRequest, configuration: WireMockConfiguration) {
+    public init(request: WireMockRequest, configuration: WireMockConfiguration) {
         self.request = request
         self.configuration = configuration
         self.wireMockCalls = WireMockCalls(configuration: configuration)
     }
     
-    convenience init(path: String, configuration: WireMockConfiguration) {
+    public convenience init(path: String, configuration: WireMockConfiguration) {
         self.init(request: WireMockRequest(path: path), configuration: configuration)
     }
     

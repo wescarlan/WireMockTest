@@ -13,7 +13,7 @@ open class WireMockApi {
     private let configuration: WireMockConfiguration
     private let wireMockCalls: WireMockCalls
     
-    init(configuration: WireMockConfiguration = WireMockConfiguration()) {
+    public init(configuration: WireMockConfiguration = WireMockConfiguration()) {
         self.configuration = configuration
         self.wireMockCalls = WireMockCalls(configuration: configuration)
     }
