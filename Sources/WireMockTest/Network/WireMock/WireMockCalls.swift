@@ -48,10 +48,8 @@ class WireMockCalls {
             initializeSessionAsync(success: {
                 semaphore.signal()
             }, failure: { (initializationError) in
-                if let initializationError = initializationError, WireMockTest.loggingEnabled {
-                    print(initializationError.localizedDescription)
-                }
                 error = initializationError
+                WireMockCalls.logError(error: error)
                 semaphore.signal()
             })
         }
@@ -80,9 +78,7 @@ class WireMockCalls {
                 mappings = wireMockMappings
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, WireMockTest.loggingEnabled {
-                    print(error.localizedDescription)
-                }
+                WireMockCalls.logError(error: error)
                 semaphore.signal()
             })
         }
@@ -111,9 +107,7 @@ class WireMockCalls {
                 mapping = wireMockMapping
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, WireMockTest.loggingEnabled {
-                    print(error.localizedDescription)
-                }
+                WireMockCalls.logError(error: error)
                 semaphore.signal()
             })
         }
@@ -135,9 +129,7 @@ class WireMockCalls {
             createMappingAsync(mapping, success: {
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, WireMockTest.loggingEnabled {
-                    print(error.localizedDescription)
-                }
+                WireMockCalls.logError(error: error)
                 semaphore.signal()
             })
         }
@@ -158,9 +150,7 @@ class WireMockCalls {
             updateMappingAsync(mapping, success: {
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, WireMockTest.loggingEnabled {
-                    print(error.localizedDescription)
-                }
+                WireMockCalls.logError(error: error)
                 semaphore.signal()
             })
         }
@@ -178,9 +168,7 @@ class WireMockCalls {
             resetMappingsAsync(success: {
                 semaphore.signal()
             }, failure: { (error) in
-                if let error = error, WireMockTest.loggingEnabled {
-                    print(error.localizedDescription)
-                }
+                WireMockCalls.logError(error: error)
                 semaphore.signal()
             })
         }
@@ -193,5 +181,16 @@ class WireMockCalls {
         let semaphore = DispatchSemaphore(value: 0)
         call(semaphore)
         let _ = semaphore.wait(timeout: .now() + synchronizedWaitTimeout)
+    }
+    
+    // MARK: - Error Logging
+    private class func logError(error: Error?) {
+        guard let error = error, WireMockTest.loggingEnabled else { return }
+        
+        if let error = error as? LocalhostError {
+            print(error.localizedDescription)
+        } else {
+            print(error.localizedDescription)
+        }
     }
 }
