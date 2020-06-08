@@ -52,14 +52,14 @@ open class WireMockStub {
     
     // MARK: - Return Response
     @discardableResult
-    open func andReturn() -> WireMockMapping {
-        let wireMockResponse = WireMockResponse(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
+    open func andReturn<T: Codable>() -> WireMockMapping<T> {
+        let wireMockResponse = WireMockResponse<T>(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
         return andReturn(wireMockResponse)
     }
     
     @discardableResult
-    open func andReturn<T: Encodable>(_ response: T) -> WireMockMapping {
-        var wireMockResponse = WireMockResponse(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
+    open func andReturn<T: Encodable>(_ response: T) -> WireMockMapping<T> {
+        var wireMockResponse = WireMockResponse<T>(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
         do {
             let responseData = try JSONEncoder().encode(response)
             let responseString = String(data: responseData, encoding: .utf8)
@@ -73,29 +73,22 @@ open class WireMockStub {
     }
     
     @discardableResult
-    open func andReturn(_ response: [String: Any]) -> WireMockMapping {
-        var wireMockResponse = WireMockResponse(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
-        wireMockResponse.jsonBody = response
-        return andReturn(wireMockResponse)
-    }
-    
-    @discardableResult
-    open func andReturn(_ response: String) -> WireMockMapping {
-        var wireMockResponse = WireMockResponse(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
+    open func andReturn(_ response: String) -> WireMockMapping<String> {
+        var wireMockResponse = WireMockResponse<String>(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
         wireMockResponse.body = response
         return andReturn(wireMockResponse)
     }
     
     @discardableResult
-    open func andReturn(_ response: URL) -> WireMockMapping {
-        var wireMockResponse = WireMockResponse(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
+    open func andReturn(_ response: URL) -> WireMockMapping<String> {
+        var wireMockResponse = WireMockResponse<String>(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
         wireMockResponse.bodyFileName = response.absoluteString
         return andReturn(wireMockResponse)
     }
     
     @discardableResult
-    open func andReturn(_ response: WireMockResponse) -> WireMockMapping {
-        let mapping = WireMockMapping(request: request, response: response)
+    open func andReturn<T: Codable>(_ response: WireMockResponse<T>) -> WireMockMapping<T> {
+        let mapping = WireMockMapping<T>(request: request, response: response)
         wireMockCalls.createMapping(mapping)
         return mapping
     }

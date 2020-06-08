@@ -23,8 +23,8 @@ class ExampleTest {
     // Update mappings using the API directly
     func test1() {
         guard let uuid = UUID(uuidString: "123"),
-            var mapping = wireMockApi.getMapping(uuid),
-            var exampleResponseObject = mapping.decodeResponseJson(ExampleCodable.self)
+            var mapping = wireMockApi.getMapping(uuid, responseType: ExampleCodable.self),
+            var exampleResponseObject = mapping.response.jsonBody
             else { return }
         
         exampleResponseObject.value = "newValue"

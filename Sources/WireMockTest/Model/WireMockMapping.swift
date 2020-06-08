@@ -8,23 +8,19 @@
 
 import Foundation
 
-public struct WireMockMapping: Codable {
+public struct WireMockMapping<T: Codable>: Codable {
     
     public let uuid: UUID
     public var request: WireMockRequest
-    public var response: WireMockResponse
+    public var response: WireMockResponse<T>
     
-    public init(uuid: UUID? = nil, request: WireMockRequest, response: WireMockResponse) {
+    public init(uuid: UUID? = nil, request: WireMockRequest, response: WireMockResponse<T>) {
         self.uuid = uuid ?? UUID()
         self.request = request
         self.response = response
     }
     
-    public func decodeResponseJson<T: Decodable>(_ responseClass: T.Type) -> T? {
-        return response.decodeResponse(responseClass)
-    }
-    
-    public mutating func updateResponseJson<T: Encodable>(_ responseJson: T) {
+    public mutating func updateResponseJson(_ responseJson: T) {
         response.updateResponse(responseJson)
     }
 }

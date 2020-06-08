@@ -20,22 +20,22 @@ open class WireMockApi {
     
     // MARK: - Endpoints
     /// Get all WireMock mappings
-    open func getMappings() -> [WireMockMapping] {
+    open func getMappings() -> [WireMockMapping<String>] {
         return wireMockCalls.getMappings()
     }
     
     /// Get a WireMock mapping by its UUID
-    open func getMapping(_ uuid: UUID) -> WireMockMapping? {
-        return wireMockCalls.getMapping(uuid: uuid)
+    open func getMapping<T: Codable>(_ uuid: UUID, responseType: T.Type) -> WireMockMapping<T>? {
+        return wireMockCalls.getMapping(uuid: uuid, responseType: responseType)
     }
     
     /// Create a new WireMock mapping
-    open func createMapping(_ mapping: WireMockMapping) {
+    open func createMapping<T: Codable>(_ mapping: WireMockMapping<T>) {
         wireMockCalls.createMapping(mapping)
     }
     
     /// Update an existing WireMock mapping
-    open func updateMapping(_ mapping: WireMockMapping) {
+    open func updateMapping<T: Codable>(_ mapping: WireMockMapping<T>) {
         wireMockCalls.updateMapping(mapping)
     }
     

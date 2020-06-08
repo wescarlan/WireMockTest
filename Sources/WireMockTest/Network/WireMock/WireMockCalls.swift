@@ -58,7 +58,7 @@ class WireMockCalls {
     }
     
     // MARK: - Get Mappings
-    private func getMappingsAsync(success: (([WireMockMapping]) -> Void)?, failure: ((Error?) -> Void)?) {
+    private func getMappingsAsync(success: (([WireMockMapping<String>]) -> Void)?, failure: ((Error?) -> Void)?) {
         sessionManager.get(path: Path.mappings, success: { (responseData) in
             guard let mappingResponse = try? JSONDecoder().decode(GetMappingsResponse.self, from: responseData) else {
                 // TODO - create WireMockError object
@@ -70,8 +70,8 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    func getMappings() -> [WireMockMapping] {
-        var mappings: [WireMockMapping] = []
+    func getMappings() -> [WireMockMapping<String>] {
+        var mappings: [WireMockMapping<String>] = []
         
         makeSynchronousCall { (semaphore) in
             getMappingsAsync(success: { (wireMockMappings) in
@@ -87,9 +87,9 @@ class WireMockCalls {
     }
     
     // MARK: - Get Mapping
-    private func getMappingAsync(uuid: UUID, success: ((WireMockMapping) -> Void)?, failure: ((Error?) -> Void)?) {
+    private func getMappingAsync<T: Codable>(uuid: UUID, responseType: T.Type, success: ((WireMockMapping<T>) -> Void)?, failure: ((Error?) -> Void)?) {
         sessionManager.get(path: Path.mappings(uuid: uuid), success: { (responseData) in
-            guard let mapping = try? JSONDecoder().decode(WireMockMapping.self, from: responseData) else {
+            guard let mapping = try? JSONDecoder().decode(WireMockMapping<T>.self, from: responseData) else {
                 // TODO - create WireMockError object
                 failure?(LocalhostError.parsing)
                 return
@@ -99,11 +99,11 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    func getMapping(uuid: UUID) -> WireMockMapping? {
-        var mapping: WireMockMapping?
+    func getMapping<T: Codable>(uuid: UUID, responseType: T.Type) -> WireMockMapping<T>? {
+        var mapping: WireMockMapping<T>?
         
         makeSynchronousCall { (semaphore) in
-            getMappingAsync(uuid: uuid, success: { (wireMockMapping) in
+            getMappingAsync(uuid: uuid, responseType: responseType, success: { (wireMockMapping) in
                 mapping = wireMockMapping
                 semaphore.signal()
             }, failure: { (error) in
@@ -116,7 +116,7 @@ class WireMockCalls {
     }
     
     // MARK: - Create Mapping
-    private func createMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+    private func createMappingAsync<T: Codable>(_ mapping: WireMockMapping<T>, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
         let bodyData = try? JSONEncoder().encode(mapping)
         
         sessionManager.post(path: Path.mappings, bodyData: bodyData, success: { (_) in
@@ -124,7 +124,7 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    func createMapping(_ mapping: WireMockMapping) {
+    func createMapping<T: Codable>(_ mapping: WireMockMapping<T>) {
         makeSynchronousCall { (semaphore) in
             createMappingAsync(mapping, success: {
                 semaphore.signal()
@@ -136,7 +136,7 @@ class WireMockCalls {
     }
     
     // MARK: - Update Mapping
-    private func updateMappingAsync(_ mapping: WireMockMapping, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+    private func updateMappingAsync<T: Codable>(_ mapping: WireMockMapping<T>, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
         let path = Path.mappings(uuid: mapping.uuid)
         let bodyData = try? JSONEncoder().encode(mapping)
         
@@ -145,7 +145,7 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    func updateMapping(_ mapping: WireMockMapping) {
+    func updateMapping<T: Codable>(_ mapping: WireMockMapping<T>) {
         makeSynchronousCall { (semaphore) in
             updateMappingAsync(mapping, success: {
                 semaphore.signal()

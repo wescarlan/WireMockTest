@@ -8,7 +8,7 @@
 
 struct GetMappingsResponse: Decodable {
     let meta: GetMappingsMetadata
-    let mappings: [WireMockMapping]
+    let mappings: [WireMockMapping<String>]
 }
 
 struct GetMappingsMetadata: Decodable {

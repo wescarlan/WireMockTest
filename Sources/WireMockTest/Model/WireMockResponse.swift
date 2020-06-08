@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct WireMockResponse {
+public struct WireMockResponse<T: Codable> {
     
     public var status: Int
     public var fixedDelay: Int?
@@ -22,7 +22,7 @@ public struct WireMockResponse {
         }
     }
     
-    public var jsonBody: [String: Any]? {
+    public var jsonBody: T? {
         didSet {
             guard jsonBody != nil else { return }
             body = nil
@@ -49,21 +49,7 @@ public struct WireMockResponse {
         self.headers = headers
     }
     
-    public init<T: Encodable>(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: T) {
-        self.init(status: status, fixedDelay: fixedDelay, headers: headers)
-        
-        do {
-            let responseData = try jsonEncoder.encode(response)
-            let json = try jsonSerializer.jsonObject(with: responseData, options: []) as? [String: Any]
-            self.jsonBody = json
-        } catch {
-            if WireMockTest.loggingEnabled {
-                print(error.localizedDescription)
-            }
-        }
-    }
-    
-    public init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: [String: Any]) {
+    public init(status: Int = 200, fixedDelay: Int? = nil, headers: [String: String]? = nil, response: T) {
         self.init(status: status, fixedDelay: fixedDelay, headers: headers)
         self.jsonBody = response
     }
@@ -89,29 +75,8 @@ public struct WireMockResponse {
         }
     }
     
-    public func decodeResponse<T: Decodable>(_ responseClass: T.Type) -> T? {
-        guard let data = bodyData else { return nil }
-        
-        do {
-            return try jsonDecoder.decode(responseClass, from: data)
-        } catch {
-            if WireMockTest.loggingEnabled {
-                print(error.localizedDescription)
-            }
-            return nil
-        }
-    }
-    
-    public mutating func updateResponse<T: Encodable>(_ response: T) {
-        do {
-            let data = try jsonEncoder.encode(response)
-            let json = try jsonSerializer.jsonObject(with: data, options: []) as? [String: Any]
-            self.jsonBody = json
-        } catch {
-            if WireMockTest.loggingEnabled {
-                print(error.localizedDescription)
-            }
-        }
+    public mutating func updateResponse(_ response: T) {
+        self.jsonBody = response
     }
 }
 
@@ -125,7 +90,7 @@ extension WireMockResponse: Codable {
         case jsonBody
         case bodyFileName
     }
-    
+
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         status = try values.decode(Int.self, forKey: .status)
@@ -133,11 +98,7 @@ extension WireMockResponse: Codable {
         headers = try? values.decode(Dictionary?.self, forKey: .headers)
         body = try? values.decode(String?.self, forKey: .body)
         bodyFileName = try? values.decode(String?.self, forKey: .bodyFileName)
-        
-        let jsonBodyString = try? values.decode(String?.self, forKey: .jsonBody)
-        if let jsonBodyData = jsonBodyString?.data(using: .utf8) {
-            jsonBody = try? JSONSerialization.jsonObject(with: jsonBodyData, options: []) as? [String: Any]
-        }
+        jsonBody = try? values.decode(T?.self, forKey: .jsonBody)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -147,10 +108,6 @@ extension WireMockResponse: Codable {
         try container.encode(headers, forKey: .headers)
         try container.encode(body, forKey: .body)
         try container.encode(bodyFileName, forKey: .bodyFileName)
-        
-        if let jsonBody = jsonBody, let jsonBodyData = try? jsonSerializer.data(withJSONObject: jsonBody, options: []) {
-            let jsonBodyString = String(data: jsonBodyData, encoding: .utf8)
-            try container.encode(jsonBodyString, forKey: .jsonBody)
-        }
+        try container.encode(jsonBody, forKey: .jsonBody)
     }
 }
