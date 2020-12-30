@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "HttpUtils",
+        "repositoryURL": "https://github.com/wescarlan/HttpUtils",
+        "state": {
+          "branch": null,
+          "revision": "e15001afc7926327a3d5598d05fb60c77030a3db",
+          "version": "0.1.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

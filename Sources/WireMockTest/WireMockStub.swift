@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HttpUtils
 
 open class WireMockStub {
     
@@ -29,7 +30,7 @@ open class WireMockStub {
     }
     
     // MARK: - Request Setters
-    open func forHttpMethod(_ method: HTTPMethod) -> WireMockStub {
+    open func forHttpMethod(_ method: HTTP.Method) -> WireMockStub {
         request.method = method
         return self
     }

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import HttpUtils
 
 class LocalhostSessionManager {
     
@@ -34,11 +35,11 @@ class LocalhostSessionManager {
         return configuration.fullUrl?.appendingPathComponent(path)
     }
     
-    /// Get the URLRequest object for a given URL and HTTPMethod
-    private func urlRequest(url: URL, method: HTTPMethod, body: Data? = nil) -> URLRequest {
+    /// Get the URLRequest object for a given URL and HTTP method
+    private func urlRequest(url: URL, method: HTTP.Method, body: Data? = nil) -> URLRequest {
         var request = URLRequest(url: url)
-        request.httpMethod = method.rawValue
-        request.setValue(HTTPHeader.Value.applicationJson, forHTTPHeaderField: HTTPHeader.Field.contentType)
+        request.setMethod(method)
+        request.setContentTypeHeader(.application(.json))
         request.httpBody = body
         return request
     }
@@ -56,7 +57,7 @@ class LocalhostSessionManager {
             return
         }
         
-        guard HTTPStatusCode.successRange.contains(httpResponse.statusCode) else {
+        guard HTTP.StatusCode.successRange.contains(httpResponse.statusCode) else {
             failure?(LocalhostError.localhostServer(statusCode: httpResponse.statusCode))
             return
         }
