@@ -174,6 +174,42 @@ class WireMockCalls {
         }
     }
     
+    // MARK: - Delete Mappings
+    private func deleteMappingsAsync(success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+        sessionManager.delete(path: Path.mappings, success: { (_) in
+            success?()
+        }, failure: failure)
+    }
+    
+    func deleteMappings() {
+        makeSynchronousCall { (semaphore) in
+            deleteMappingsAsync(success: {
+                semaphore.signal()
+            }, failure: { (error) in
+                WireMockCalls.logError(error: error)
+                semaphore.signal()
+            })
+        }
+    }
+    
+    // MARK: - Delete Mapping
+    private func deleteMappingAsync(uuid: UUID, success: (() -> Void)?, failure: ((Error?) -> Void)?) {
+        sessionManager.delete(path: Path.mappings(uuid: uuid), success: { (_) in
+            success?()
+        }, failure: failure)
+    }
+    
+    func deleteMapping(uuid: UUID) {
+        makeSynchronousCall { (semaphore) in
+            deleteMappingAsync(uuid: uuid, success: {
+                semaphore.signal()
+            }, failure: { (error) in
+                WireMockCalls.logError(error: error)
+                semaphore.signal()
+            })
+        }
+    }
+    
     // MARK: - Synchronization
     private let synchronizedWaitTimeout: TimeInterval = 5.0
     

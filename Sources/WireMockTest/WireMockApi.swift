@@ -43,4 +43,14 @@ open class WireMockApi {
     open func resetMappings() {
         wireMockCalls.resetMappings()
     }
+    
+    /// Delete all WireMock mappings
+    open func deleteMappings() {
+        wireMockCalls.deleteMappings()
+    }
+    
+    /// Delete a WireMock mapping by its UUID
+    open func deleteMapping(_ uuid: UUID) {
+        wireMockCalls.deleteMapping(uuid: uuid)
+    }
 }

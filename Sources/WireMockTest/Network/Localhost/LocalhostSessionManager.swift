@@ -133,4 +133,26 @@ class LocalhostSessionManager {
         
         task.resume()
     }
+    
+    // MARK: - DELETE Request
+    /// Execute a DELETE request
+    func delete(path: String, success: LocalhostSuccess?, failure: LocalhostFailure?) {
+        guard let url = url(path: path) else {
+            failure?(LocalhostError.invalidUrl(url: configuration.fullUrlString))
+            return
+        }
+        
+        let request = urlRequest(url: url, method: .delete)
+        
+        let task = urlSession.dataTask(with: request) { (data, response, error) in
+            LocalhostSessionManager.handleResponse(
+                data: data,
+                response: response,
+                error: error,
+                success: success,
+                failure: failure)
+        }
+        
+        task.resume()
+    }
 }
