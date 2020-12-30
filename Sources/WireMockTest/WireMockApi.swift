@@ -20,7 +20,7 @@ open class WireMockApi {
     
     // MARK: - Endpoints
     /// Get all WireMock mappings
-    open func getMappings() -> [WireMockMapping<String>] {
+    open func getMappings() -> [WireMockMapping<Data>] {
         return wireMockCalls.getMappings()
     }
     

@@ -6,9 +6,11 @@
 //  Copyright © 2019 Wesley Carlan. All rights reserved.
 //
 
+import Foundation
+
 struct GetMappingsResponse: Decodable {
     let meta: GetMappingsMetadata
-    let mappings: [WireMockMapping<String>]
+    let mappings: [WireMockMapping<Data>]
 }
 
 struct GetMappingsMetadata: Decodable {

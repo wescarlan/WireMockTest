@@ -58,7 +58,7 @@ class WireMockCalls {
     }
     
     // MARK: - Get Mappings
-    private func getMappingsAsync(success: (([WireMockMapping<String>]) -> Void)?, failure: ((Error?) -> Void)?) {
+    private func getMappingsAsync(success: (([WireMockMapping<Data>]) -> Void)?, failure: ((Error?) -> Void)?) {
         sessionManager.get(path: Path.mappings, success: { (responseData) in
             guard let mappingResponse = try? JSONDecoder().decode(GetMappingsResponse.self, from: responseData) else {
                 // TODO - create WireMockError object
@@ -70,8 +70,8 @@ class WireMockCalls {
         }, failure: failure)
     }
     
-    func getMappings() -> [WireMockMapping<String>] {
-        var mappings: [WireMockMapping<String>] = []
+    func getMappings() -> [WireMockMapping<Data>] {
+        var mappings: [WireMockMapping<Data>] = []
         
         makeSynchronousCall { (semaphore) in
             getMappingsAsync(success: { (wireMockMappings) in
