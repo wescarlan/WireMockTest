@@ -46,9 +46,9 @@ class ExampleTest {
     func test3() {
         wireMock.stub("/path")
             .forHttpMethod(.get)
-            .andSetStatus(200)
-            .andSetFixedDelay(5)
-            .andSetHeaders(["authorization": "abcde12345"])
+            .withResponseStatus(200)
+            .withResponseDelay(5)
+            .withResponseHeaders(["authorization": "abcde12345"])
             .andReturn(ExampleCodable(value: "newValue"))
     }
 }

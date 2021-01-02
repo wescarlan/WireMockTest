@@ -36,28 +36,22 @@ open class WireMockStub {
     }
     
     // MARK: - Response Setters
-    open func andSetStatus(_ status: Int) -> WireMockStub {
+    open func withResponseStatus(_ status: Int) -> WireMockStub {
         responseStatus = status
         return self
     }
     
-    open func andSetFixedDelay(_ delay: Int) -> WireMockStub {
+    open func withResponseDelay(_ delay: Int) -> WireMockStub {
         responseDelay = delay
         return self
     }
     
-    open func andSetHeaders(_ headers: [String: String]) -> WireMockStub {
+    open func withResponseHeaders(_ headers: [String: String]) -> WireMockStub {
         responseHeaders = headers
         return self
     }
     
     // MARK: - Return Response
-    @discardableResult
-    open func andReturn<T: Codable>() -> WireMockMapping<T> {
-        let wireMockResponse = WireMockResponse<T>(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)
-        return andReturn(wireMockResponse)
-    }
-    
     @discardableResult
     open func andReturn<T: Encodable>(_ response: T) -> WireMockMapping<T> {
         var wireMockResponse = WireMockResponse<T>(status: responseStatus, fixedDelay: responseDelay, headers: responseHeaders)

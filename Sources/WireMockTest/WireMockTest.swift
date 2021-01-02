@@ -36,6 +36,7 @@ open class WireMockTest {
     }
     
     open func resetStubs() {
+        wireMockCalls.deleteMappings()
         wireMockCalls.resetMappings()
     }
 }
